@@ -47,9 +47,14 @@ if uploaded_file is not None:
         # 2. Ask the AI to format the raw text into our specific HTML layout
         prompt = f"""
         You are a catering expeditor assistant. I am giving you the raw text from a catering order receipt.
-        Extract all names, proteins, meat temperatures, sides, special instructions, and desserts.
+        Extract all names, proteins, meat temperatures, sides, special instructions, desserts, AND the Order Metadata (Order Number, Date, Time, and Headcount).
+        
+        CRITICAL EXTRACTION RULES:
+        - The raw text is extracted from a PDF. Because of this, variables like 'HEADCOUNT', the Date, the Time, 'Side', 'Dessert', 'Please Prepare Meat', and 'Special Instructions' will often appear on the lines directly UNDERNEATH their respective labels, rather than next to them. 
+        - You must carefully read the lines below headings to associate the correct values. For example, the headcount number will be on the line below the word 'HEADCOUNT'. The actual date will be below 'To be picked up by Dispatch' or 'Date'.
         
         Format the output EXACTLY as a beautiful, professional HTML document using inline CSS. 
+        - The header of the HTML document MUST prominently display the extracted Order Number, Date, Time, and Headcount (e.g., "<p>Order #12345 | Thursday, May 14 @ 5:25 PM | Headcount: 45</p>").
         - Group the list by Protein.
         - IMPORTANT: If the receipt specifies a size for the protein/meal (e.g., "6 oz") or indicates it is a "Boxed Meal" or "Bundle", INCLUDE that size and bundle information directly in the Protein Group Heading.
         - Under each protein, group by Side item.
