@@ -33,17 +33,12 @@ try:
         background-attachment: fixed;
     }}
         header[data-testid="stHeader"] {{ background-color: transparent !important; }}
-    
-    h1 {{ color: #7851A9; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }}
-    
-    [data-testid="stMarkdownContainer"] p {{ font-family: 'Helvetica Neue', Helvetica, sans-serif; color: #444444; font-weight: 600; }}
-    
-    [data-testid="stFileUploader"] {{
-        background-color: rgba(120, 81, 169, 0.95);
-        color: white; padding: 15px; border-radius: 8px; font-weight: bold;
-        border: 2px solid #5e3a8c; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }}
-
+    h1 {{ color: #7851A9; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }}
+     [data-testid="stFileUploader"] {{
+        background-color: rgba(246, 185, 59, 0.95);
+         color: white; padding: 15px; border-radius: 8px; font-weight: bold;
+        border: 2px solid #e1a028; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+     }}
     }}
     [data-testid="stMarkdownContainer"] p {{ font-family: 'Helvetica Neue', Helvetica, sans-serif; color: #222222; font-weight: 600; }}
     </style>
@@ -203,7 +198,7 @@ if uploaded_file is not None:
             file_name="kitchen_prep_list.pdf",
             mime="application/pdf"
         )
-        
+         
     os.remove(output_pdf)
     with st.spinner("Reading PDF and extracting summary data..."):
         # 1. Read the uploaded PDF
@@ -211,15 +206,15 @@ if uploaded_file is not None:
         raw_text = ""
         for page in reader.pages:
             raw_text += page.extract_text() + "\n"
-                        # 2. Ask the AI to format the raw text into our specific SUMMARY HTML layout
+                         # 2. Ask the AI to format the raw text into our specific SUMMARY HTML layout
         prompt = f"""
         You are an expert catering expeditor. I am giving you the raw text extracted from a catering order PDF. 
         Your task is to create a high-level "Catering Order Expeditor Summary" WITHOUT individual names, but WITH exact calculated quantities.
         
         CRITICAL EXTRACTION RULES FOR PDF TEXT:
         1. HEADER DATA: Search the text for 'Headcount', 'Date', 'Time'. (Note: If the text literally says "Incomplete Date" or "Not specified", output exactly that).
-        2. COUNTING PROTEINS: Identify every single protein order. Pay close attention to sizes (e.g., 'Large', 'Small'). You MUST treat 'Large' and 'Small' as TWO COMPLETELY SEPARATE CATEGORIES. Do not merge them. Count EXACTLY how many of each exist.
-        3. COUNTING SIDES: For EACH protein group, look at the sides listed beneath it. You MUST do the math. If 'House Salad' appears 3 times under the Large Chicken, you must add them up and output "[ 3x ] House Salad". Do not just write [1x] for everything.
+        2. COUNTING PROTEINS: Identify every single protein order. Pay close attention to sizes (e.g., 'Large', 'Small'). You MUST treat 'Large' and 'Small' as TWO COMPLETELY SEPARATE CATEGORIES.[...]
+        3. COUNTING SIDES: For EACH protein group, look at the sides listed beneath it. You MUST do the math. If 'House Salad' appears 3 times under the Large Chicken, you must add them up and ou[...]
         4. ORDERS WITH A 'QTY': If there is a 'qty' or 'quantity' listed, this should be taken into account. 
         
         Format the output EXACTLY as a beautiful, professional HTML document using inline CSS. Follow this exact structure:
@@ -232,7 +227,7 @@ if uploaded_file is not None:
             - INCLUDE the exact calculated total quantity for the protein in the heading (e.g., "<h2>[ 2x ] Perfectly Grilled Salmon (Large)</h2>").
             - Under each protein, add a subheading called "Associated Sides:".
             - List the sides and dressings that go with that protein, AND INCLUDE THEIR CALCULATED TOTAL QUANTITIES. 
-            - Format the sides with a functional expeditor checkbox: "<li><span style='border: 1px solid #333; padding: 0 5px;'>&nbsp;&nbsp;</span> <strong>[ 3x ]</strong> House Salad w/ Ranch</li>"
+            - Format the sides with a functional expeditor checkbox: "<li><span style='border: 1px solid #333; padding: 0 5px;'>&nbsp;&nbsp;</span> <strong>[ 3x ]</strong> House Salad w/ Ranch</l[...]
         5. "Desserts" Section: Aggregate and list all desserts with their TOTAL CALCULATED QUANTITIES.
         6. "Meat Temperatures" Section: Aggregate and list all requested meat temperatures with their TOTAL CALCULATED QUANTITIES.
         
@@ -243,7 +238,7 @@ if uploaded_file is not None:
         """
 
 
-        
+         
         # 3. Call the AI using the 2.5 model
         response = client.models.generate_content(
             model='gemini-2.5-flash',
@@ -266,6 +261,6 @@ if uploaded_file is not None:
             file_name="catering_prep_summary.pdf",
             mime="application/pdf"
         )
-        
+         
     # Clean up the file
     os.remove(output_pdf)
