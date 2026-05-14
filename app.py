@@ -84,14 +84,14 @@ if uploaded_file is not None:
         pdf_bytes = uploaded_file.getvalue()
         document_part = types.Part.from_bytes(data=pdf_bytes, mime_type='application/pdf')
         
-        prompt = """
+                prompt = """
         You are an expert kitchen expeditor. I have attached a catering order receipt as a PDF. Read the document carefully.
         Your task is to calculate all totals and generate a "Catering Order Prep & Kitchen List" using the STRICT HTML TABLE structure provided below.
         
         CRITICAL RULES:
         1. Read the layout visually. Connect sides, dressings, and temperatures to the correct items.
         2. DO THE MATH: Aggregate every single identical item. If there are 15 Medium-Rare Sirloins, output the total 15. Do not list items one by one.
-        3. Extract the Order Number, Client/Platform (e.g., Zifty Dispatch), and Headcount for the header.
+        3. Extract the Order Number, Client/Platform (e.g., Zifty Dispatch), Date, Time, and Headcount for the header. If the Date or Time says "Incomplete", write "Not Specified".
         4. Group sub-items (like meat temps, salad dressings, or "NO butter" notes) underneath their parent item using the nested <ul> lists from the template.
         5. Output ONLY the raw HTML code. Do not wrap in ```html markdown blocks.
 
@@ -120,7 +120,7 @@ if uploaded_file is not None:
         </head>
         <body>
             <h1>Catering Order Prep & Kitchen List</h1>
-            <p class="subtitle">Order #[ORDER_NUM] | [CLIENT_NAME] | Headcount: [HEADCOUNT]</p>
+            <p class="subtitle">Order #[ORDER_NUM] | [CLIENT_NAME] | [DATE] @ [TIME] | Headcount: [HEADCOUNT]</p>
 
             <h2>Non-Food Items & Packaging</h2>
             <table>
@@ -172,6 +172,8 @@ if uploaded_file is not None:
         </body>
         </html>
         """
+
+   
         
         # Pass both the raw PDF part and the prompt text to the model
         response = client.models.generate_content(
