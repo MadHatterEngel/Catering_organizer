@@ -40,7 +40,25 @@ try:
         border: 2px solid #e1a028; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
      }}
     }}
-    [data-testid="stMarkdownContainer"] p {{ font-family: 'Helvetica Neue', Helvetica, sans-serif; color: #222222; font-weight: 600; }}
+        /* Madhatter Orange Upload Container */
+    [data-testid="stFileUploader"] {{
+        background-color: rgba(246, 185, 59, 0.95);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        border: 2px solid #e1a028;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }}
+    
+    /* Fix the inner "Browse files" button so the text is visible! */
+    [data-testid="stFileUploader"] button {{
+        color: #d35400 !important; /* Dark orange text */
+        background-color: white !important; /* White button */
+        border: 1px solid #e1a028 !important;
+        font-weight: bold;
+    }}
+
     </style>
     '''
     st.markdown(page_bg_img, unsafe_allow_html=True)
