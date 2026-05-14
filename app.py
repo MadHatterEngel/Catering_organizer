@@ -107,35 +107,37 @@ if uploaded_file is not None:
         raw_text = ""
         for page in reader.pages:
             raw_text += page.extract_text() + "\n"
-                # 2. Ask the AI to format the raw text into our specific SUMMARY HTML layout
+                        # 2. Ask the AI to format the raw text into our specific SUMMARY HTML layout
         prompt = f"""
         You are an expert catering expeditor. I am giving you the raw text extracted from a catering order PDF. 
         Your task is to create a high-level "Catering Order Expeditor Summary" WITHOUT individual names, but WITH exact calculated quantities.
         
         CRITICAL EXTRACTION RULES FOR PDF TEXT:
-        - The raw text is extracted from a PDF, which often scrambles columns. 
-        - HEADCOUNT / DATE / TIME: Search the entire text aggressively for clues like 'Headcount', 'Guest Count', 'Delivery', 'Pickup', 'Due'. The actual numbers/dates might be floating several lines above or below the labels. Find them and combine them into the Header.
-        - QUANTITIES: You MUST calculate the total quantity of every single item. If the raw text lists 10 different people ordering "House Salad", you must output "[ 10x ] House Salad". Do not just list the item name; you MUST do the math and provide the aggregate count for the kitchen.
+        1. HEADER DATA: Search the text for 'Headcount', 'Date', 'Time'. (Note: If the text literally says "Incomplete Date" or "Not specified", output exactly that).
+        2. COUNTING PROTEINS: Identify every single protein order. Pay close attention to sizes (e.g., 'Large', 'Small'). You MUST treat 'Large' and 'Small' as TWO COMPLETELY SEPARATE CATEGORIES. Do not merge them. Count EXACTLY how many of each exist.
+        3. COUNTING SIDES: For EACH protein group, look at the sides listed beneath it. You MUST do the math. If 'House Salad' appears 3 times under the Large Chicken, you must add them up and output "[ 3x ] House Salad". Do not just write [1x] for everything.
+        4. ORDERS WITH A 'QTY': If there is a 'qty' or 'quantity' listed, this should be taken into account. 
         
         Format the output EXACTLY as a beautiful, professional HTML document using inline CSS. Follow this exact structure:
         
         1. Document Title: Prominently display "Catering Order Expeditor Summary" at the top.
-        2. Header Banner: Display the extracted Order Number, Date, Time, and Headcount (e.g., "<p>Order #12345 | Thursday, May 14 @ 5:25 PM | Headcount: 45</p>"). If you absolutely cannot find the data, write "Not Specified".
-        3. "Special Instructions" Section: List any general order instructions, tableware notes, or global setup details.
+        2. Header Banner: Display the extracted Order Number, Date, Time, and Headcount. 
+        3. "Special Instructions" Section: List any general order instructions, tableware notes.
         4. "Meal Breakdown" Section: 
-            - Group the list by Protein.
-            - IMPORTANT: INCLUDE the calculated total quantity for the protein in the heading (e.g., "<h2>[ 15x ] Center-Cut Sirloin (6 oz)</h2>").
+            - Group the list by Protein AND Size.
+            - INCLUDE the exact calculated total quantity for the protein in the heading (e.g., "<h2>[ 2x ] Perfectly Grilled Salmon (Large)</h2>").
             - Under each protein, add a subheading called "Associated Sides:".
             - List the sides and dressings that go with that protein, AND INCLUDE THEIR CALCULATED TOTAL QUANTITIES. 
-            - Format the sides with a functional expeditor checkbox like this: "<li><span style='border: 1px solid #333; padding: 0 5px;'>&nbsp;&nbsp;</span> <strong>[ 7x ]</strong> House Salad w/ Ranch</li>"
-        5. "Desserts" Section: Aggregate and list all desserts with their TOTAL CALCULATED QUANTITIES (e.g., "[ 5x ] Chocolate Chip Cookie").
-        6. "Meat Temperatures" Section: Aggregate and list all requested meat temperatures with their TOTAL CALCULATED QUANTITIES (e.g., "[ 4x ] Medium-Rare").
+            - Format the sides with a functional expeditor checkbox: "<li><span style='border: 1px solid #333; padding: 0 5px;'>&nbsp;&nbsp;</span> <strong>[ 3x ]</strong> House Salad w/ Ranch</li>"
+        5. "Desserts" Section: Aggregate and list all desserts with their TOTAL CALCULATED QUANTITIES.
+        6. "Meat Temperatures" Section: Aggregate and list all requested meat temperatures with their TOTAL CALCULATED QUANTITIES.
         
         - ONLY output the raw HTML code, nothing else. No markdown formatting blocks.
         
         Raw Catering Receipt Text:
         {raw_text}
         """
+
 
         
         # 3. Call the AI using the 2.5 model
