@@ -84,7 +84,7 @@ if uploaded_file is not None:
         pdf_bytes = uploaded_file.getvalue()
         document_part = types.Part.from_bytes(data=pdf_bytes, mime_type='application/pdf')
         
-                prompt = """
+        prompt = """
         You are an expert kitchen expeditor. I have attached a catering order receipt as a PDF. Read the document carefully.
         Your task is to calculate all totals and generate a "Catering Order Prep & Kitchen List" using the STRICT HTML TABLE structure provided below.
         
