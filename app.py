@@ -1,5 +1,5 @@
 import streamlit as st
-from google import genai  # <-- NEW SDK IMPORT
+from google import genai
 from PyPDF2 import PdfReader
 from weasyprint import HTML
 import os
@@ -24,7 +24,7 @@ if not api_key:
     st.error("❌ GEMINI_API_KEY not found. Please set it in your environment or Streamlit secrets.")
     st.stop()
 
-# <-- NEW SDK INITIALIZATION -->
+# Initialize the new SDK Client
 client = genai.Client(api_key=api_key)
 
 # --- APP UI ---
@@ -51,6 +51,7 @@ if uploaded_file is not None:
         
         Format the output EXACTLY as a beautiful, professional HTML document using inline CSS. 
         - Group the list by Protein.
+        - IMPORTANT: If the receipt specifies a size for the protein/meal (e.g., "6 oz") or indicates it is a "Boxed Meal" or "Bundle", INCLUDE that size and bundle information directly in the Protein Group Heading.
         - Under each protein, group by Side item.
         - Under the sides, list the names alphabetically.
         - Put expeditor checkboxes [ ] next to the names.
@@ -61,7 +62,7 @@ if uploaded_file is not None:
         {raw_text}
         """
         
-        # <-- NEW SDK API CALL -->
+        # 3. Call the AI using the updated model
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=prompt,
@@ -69,13 +70,13 @@ if uploaded_file is not None:
         html_content = response.text.replace("```html", "").replace("```", "").strip()
 
     with st.spinner("Generating beautiful PDF..."):
-        # 3. Convert the AI-generated HTML into a downloadable PDF
+        # 4. Convert the AI-generated HTML into a downloadable PDF
         output_pdf = "organized_catering_list.pdf"
         HTML(string=html_content).write_pdf(output_pdf)
     
     st.success("Done! Your organized list is ready.")
     
-    # 4. Provide the download button
+    # 5. Provide the download button
     with open(output_pdf, "rb") as pdf_file:
         st.download_button(
             label="⬇️ Download Organized PDF",
@@ -84,5 +85,5 @@ if uploaded_file is not None:
             mime="application/pdf"
         )
         
-    # Optional: Clean up the file after it's loaded into the button
+    # Clean up the file
     os.remove(output_pdf)
