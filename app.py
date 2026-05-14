@@ -175,7 +175,7 @@ if uploaded_file is not None:
         
         # Pass both the raw PDF part and the prompt text to the model
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-2.5-flash',
             contents=[document_part, prompt],
         )
         html_content = response.text.replace("```html", "").replace("```", "").strip()
