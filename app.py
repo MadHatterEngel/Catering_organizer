@@ -63,7 +63,7 @@ if uploaded_file is not None:
         
         # <-- NEW SDK API CALL -->
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.5-flash',
             contents=prompt,
         )
         html_content = response.text.replace("```html", "").replace("```", "").strip()
