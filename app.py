@@ -33,7 +33,7 @@ try:
         background-attachment: fixed;
     }}
     header[data-testid="stHeader"] {{ background-color: transparent !important; }}
-    h1 {{ color: #111111; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }}
+    h1 {{ color: #7851A9; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }}
     [data-testid="stFileUploader"] {{
         background-color: rgba(246, 185, 59, 0.95);
         color: white; padding: 15px; border-radius: 8px; font-weight: bold;
