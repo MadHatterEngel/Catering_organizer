@@ -64,7 +64,7 @@ if uploaded_file is not None:
         
         # 3. Call the AI using the updated model
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-2.5-flash',
             contents=prompt,
         )
         html_content = response.text.replace("```html", "").replace("```", "").strip()
