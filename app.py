@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai  # <-- NEW SDK IMPORT
 from PyPDF2 import PdfReader
 from weasyprint import HTML
 import os
@@ -10,14 +10,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get API key from Streamlit secrets (deployment) or environment variables (local)
-api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+try:
+    # Safely try to get it from secrets first
+    api_key = st.secrets.get("GEMINI_API_KEY")
+except Exception:
+    api_key = None
+
+# If not in secrets, look in the local environment variables
+if not api_key:
+    api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
     st.error("❌ GEMINI_API_KEY not found. Please set it in your environment or Streamlit secrets.")
     st.stop()
 
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+# <-- NEW SDK INITIALIZATION -->
+client = genai.Client(api_key=api_key)
 
 # --- APP UI ---
 st.set_page_config(page_title="Catering Organizer", page_icon="🍱")
@@ -53,8 +61,11 @@ if uploaded_file is not None:
         {raw_text}
         """
         
-        # Call the AI
-        response = model.generate_content(prompt)
+        # <-- NEW SDK API CALL -->
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=prompt,
+        )
         html_content = response.text.replace("```html", "").replace("```", "").strip()
 
     with st.spinner("Generating beautiful PDF..."):
