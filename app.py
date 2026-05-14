@@ -32,12 +32,18 @@ try:
         background-repeat: no-repeat;
         background-attachment: fixed;
     }}
-    header[data-testid="stHeader"] {{ background-color: transparent !important; }}
-    h1 {{ color: #7851A9; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }}
+        header[data-testid="stHeader"] {{ background-color: transparent !important; }}
+    
+    h1 {{ color: #7851A9; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }}
+    
+    [data-testid="stMarkdownContainer"] p {{ font-family: 'Helvetica Neue', Helvetica, sans-serif; color: #444444; font-weight: 600; }}
+    
     [data-testid="stFileUploader"] {{
-        background-color: rgba(246, 185, 59, 0.95);
+        background-color: rgba(120, 81, 169, 0.95);
         color: white; padding: 15px; border-radius: 8px; font-weight: bold;
-        border: 2px solid #e1a028; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 2px solid #5e3a8c; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }}
+
     }}
     [data-testid="stMarkdownContainer"] p {{ font-family: 'Helvetica Neue', Helvetica, sans-serif; color: #222222; font-weight: 600; }}
     </style>
