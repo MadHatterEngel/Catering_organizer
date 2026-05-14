@@ -3,59 +3,69 @@ from google import genai
 from PyPDF2 import PdfReader
 from weasyprint import HTML
 import os
-import base64  # <-- NEW: Used for image encoding
+import base64
 from dotenv import load_dotenv
 
 # =========================================================
 # --- CUSTOM APP STYLING (THE FADED LOGO BACKGROUND) ---
 # =========================================================
 
-# Function to read and encode local image file
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
-# Try to load the logo image from the repo root
 try:
-    img_path = os.path.join(os.path.dirname(__file__), '8696.png')
+    # Try finding the file safely
+    img_path = '8696.png'
+    if not os.path.exists(img_path):
+        img_path = os.path.join(os.path.dirname(__file__), '8696.png')
+        
     bin_str = get_base64_of_bin_file(img_path)
     
-    # Injected CSS to set background, fading, fonts, and button colors
+    # Injected CSS targeting the absolute top layer (.stApp)
     page_bg_img = f'''
     <style>
-    /* Sets the centered, fixed background with white overlay for fading */
-    [data-testid="stAppViewContainer"] > .main {{
-        background-image: linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), 
+    /* Forces the background image to cover the entire screen */
+    .stApp {{
+        background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), 
                           url("data:image/png;base64,{bin_str}");
-        background-size: 50% !important;
+        background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
     }}
     
-    /* Clean up headers */
-    h1 {{ color: #333333; font-weight: 700; }}
+    /* Makes the top header bar transparent so it doesn't cut off the image */
+    header[data-testid="stHeader"] {{
+        background-color: transparent !important;
+    }}
+    
+    /* Clean up headers to pop against the background */
+    h1 {{ color: #111111; font-weight: 800; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }}
     
     /* Madhatter Orange Upload Button */
     [data-testid="stFileUploader"] {{
-        background-color: #f6b93b;
+        background-color: rgba(246, 185, 59, 0.95);
         color: white;
         padding: 15px;
         border-radius: 8px;
         font-weight: bold;
+        border: 2px solid #e1a028;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }}
     
     /* Customize text info above upload */
     [data-testid="stMarkdownContainer"] p {{
         font-family: 'Helvetica Neue', Helvetica, sans-serif;
-        color: #555555;
+        color: #222222;
+        font-weight: 600;
     }}
     </style>
     '''
     st.markdown(page_bg_img, unsafe_allow_html=True)
 except Exception as e:
-    st.warning("Just a heads-up: We couldn't find '8696.png' in your GitHub main folder, so the custom background hasn't been applied yet. Once you upload the image, this app will look even better!")
+    pass # Silently proceed if the image isn't found
 
 # =========================================================
 # --- REST OF APP LOGIC (API Setup, PDF Processing) ---
@@ -67,12 +77,10 @@ load_dotenv()
 
 # Get API key from Streamlit secrets (deployment) or environment variables (local)
 try:
-    # Safely try to get it from secrets first
     api_key = st.secrets.get("GEMINI_API_KEY")
 except Exception:
     api_key = None
 
-# If not in secrets, look in the local environment variables
 if not api_key:
     api_key = os.getenv("GEMINI_API_KEY")
 
@@ -84,7 +92,7 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 # --- APP UI ---
-st.set_page_config(page_title="Madhatter Catering Prep Summary", page_icon="📋")
+st.set_page_config(page_title="Madhatter Catering Prep", page_icon="📋")
 st.title("📋 Catering Order Prep Summary")
 st.write("Upload a catering PDF to generate a clean, aggregated prep summary without individual names!")
 
@@ -129,7 +137,7 @@ if uploaded_file is not None:
         {raw_text}
         """
         
-        # 3. Call the AI using the updated model
+        # 3. Call the AI using the 2.0 model
         response = client.models.generate_content(
             model='gemini-2.0-flash',
             contents=prompt,
