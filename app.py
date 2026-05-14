@@ -3,10 +3,20 @@ import google.generativeai as genai
 from PyPDF2 import PdfReader
 from weasyprint import HTML
 import os
+from dotenv import load_dotenv
 
 # --- SETUP API ---
-# Replace with your actual Gemini API key
-genai.configure(api_key="AIzaSyDWnwbfzdxm5qAdwum_qDTte4dQ07Clzxw")
+# Load environment variables from .env file (local development)
+load_dotenv()
+
+# Get API key from Streamlit secrets (deployment) or environment variables (local)
+api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    st.error("❌ GEMINI_API_KEY not found. Please set it in your environment or Streamlit secrets.")
+    st.stop()
+
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # --- APP UI ---
